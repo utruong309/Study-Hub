@@ -8,4 +8,4 @@ server/.env
 
 # system
 .DS_Store
-.env
+.envserver/config/firebase-admin.json
