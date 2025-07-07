@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose"; 
 import cors from "cors"; 
 import dotenv from "dotenv";
-import noteRoutes from "./routes/notes"; 
+import noteRoutes from "./routes/notes"; //stores whatver is exported from notes.js
 
 dotenv.config(); 
 
