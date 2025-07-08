@@ -1,4 +1,5 @@
 import React from "react"; 
+import './App.css';
 
 const NoteCard = ({ note, onEdit, onDelete }) => {
     return (

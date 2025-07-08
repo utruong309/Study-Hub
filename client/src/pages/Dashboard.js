@@ -1,3 +1,6 @@
+//shows notes from MongoDB
+//lets users add, edit, and delete notes 
+
 import React, { useEffect, useState } from "react";
 import {
   fetchNotes,
@@ -8,36 +11,46 @@ import {
 import NoteCard from "../components/NoteCard";
 import NoteForm from "../components/NoteForm";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Dashboard = () => {
-  const [notes, setNotes] = useState([]);
-  const [editingNote, setEditingNote] = useState(null);
-  const [user, setUser] = useState(null);
+  const [notes, setNotes] = useState([]); // All user’s notes 
+  const [editingNote, setEditingNote] = useState(null); // Currently edited note
+  const [user, setUser] = useState(null); // Logged-in user
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    onAuthStateChanged(getAuth(), (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) loadNotes();
+//
+  useEffect(() => { //runs the logic here once Dashboard.js component appear 
+    onAuthStateChanged(getAuth(), (firebaseUser) => { //onAuthStateChanged is a Firebase method that listens for login/logout 
+      setUser(firebaseUser); //set user 
+      if (firebaseUser) loadNotes(); //fetch notes 
+      else setLoading(false); 
     });
-  }, []);
+  }, []); //whenever the auth state changes, (e.g., user signs in or out), the callback runs 
 
+  console.log("Firebase user:", firebaseUser);
+  
   const loadNotes = async () => {
     try {
-      const res = await fetchNotes();
-      setNotes(res.data);
+      const notes = await fetchNotes(); //call API, axios.get to the backend, send data back
+      setNotes(notes); 
+      console.log(notes); 
     } catch (err) {
       console.error("Failed to fetch notes", err);
     }
+    setLoading(false); 
   };
 
-  const handleAddOrUpdate = async (data) => {
+  if (loading) return <LoadingSpinner />;
+
+  const handleAddOrUpdate = async (data) => { //edit note, data is the new note 
     try {
       if (editingNote) {
-        const res = await updateNote(editingNote._id, data);
-        setNotes(notes.map((n) => (n._id === res.data._id ? res.data : n)));
+        const res = await updateNote(editingNote._id, data); //call API
+        setNotes(notes.map((n) => (n._id === res._id ? res : n))); //select only ids 
       } else {
         const res = await createNote(data);
-        setNotes([...notes, res.data]);
+        setNotes([...notes, res]);
       }
       setEditingNote(null);
     } catch (err) {
